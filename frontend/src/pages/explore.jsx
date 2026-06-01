@@ -1,7 +1,7 @@
 import Sidebar from '../components/sidebar'
 import Navbar from '../components/navbar'
 import { useState } from 'react'
-export default function Home(){
+export default function Explore(){
    
     const [open, setOpen] = useState(false);
 

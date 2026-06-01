@@ -4,9 +4,11 @@ import Login from './pages/login'
 import Register from './pages/register'
 import Home from './pages/home'
 import Profile from './pages/profile'
-import './App.css'
 import Notfound from './pages/notFound'
 import ProtectedRoute from './components/ProtectedRoute'
+import Explore from './pages/explore'
+import Saved from './pages/saved'
+import AboutUs from './pages/aboutus'
 
 
 function Logout(){
@@ -34,6 +36,24 @@ function App() {
           <Route path="/profile" element={
             <ProtectedRoute>
             <Profile/>
+            </ProtectedRoute>
+            }/>  
+
+             <Route path="/explore" element={
+            <ProtectedRoute>
+            <Explore/>
+            </ProtectedRoute>
+            }/>  
+
+             <Route path="/saved" element={
+            <ProtectedRoute>
+            <Saved/>
+            </ProtectedRoute>
+            }/>  
+
+             <Route path="/aboutus" element={
+            <ProtectedRoute>
+            <AboutUs/>
             </ProtectedRoute>
             }/>  
 

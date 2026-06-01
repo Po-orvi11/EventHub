@@ -1,12 +1,13 @@
 import { useEffect, useState } from "react"
 import api from '../api'
+import Navbar from "../components/navbar"
 
 export default function Profile(){
     const [user, setUser] = useState(null)
     const [firstname, setFirstname] = useState("")
     const [lastname, setLastname] = useState("")
     const [phone, setPhone] = useState("")
-    const [location, setLocation] = useState("")
+    const [city, setCity] = useState("")
 
     useEffect(()=> {
         getProfile()
@@ -19,7 +20,7 @@ export default function Profile(){
         setFirstname(res.data.firstname)
         setLastname(res.data.lastname)
         setPhone(res.data.phone)
-        setLocation(res.data.location)
+        setCity(res.data.city)
        }
        catch(error){
         console.log(error)
@@ -29,7 +30,7 @@ export default function Profile(){
     const updateProfile = async ()=> {
         try {
             const res = await api.patch("/api/profile/", {
-                firstname,lastname,phone,location
+                firstname,lastname,phone,city
             })
             alert("Profile Update")
         }
@@ -41,7 +42,9 @@ export default function Profile(){
         return <p>Loading...</p>
     }
 
-    return <div className="flex h-screen">
+    return (<>
+    <Navbar/>
+    <div className="flex h-screen">
 
         <div className="bg-blue-200 w-50">
             <h1>{user.username}</h1>
@@ -74,8 +77,8 @@ export default function Profile(){
 
              <input
             type="text"
-            placeholder="Location"
-            value={location || ""}
+            placeholder="City"
+            value={city || ""}
             onChange={(e)=> setLocation(e.target.value)}
             />
 
@@ -83,4 +86,5 @@ export default function Profile(){
 
         </div>
     </div>
+    </>)
 }

@@ -1,7 +1,8 @@
 from django.contrib.auth.models import User
 from django.contrib.auth import authenticate
 from rest_framework import serializers
-from .models import Profile
+from .models import Profile, OrganizerProfile, PortfolioImage
+import random
 
 class RegisterSerializer(serializers.ModelSerializer):
     confirm_password = serializers.CharField(write_only = True)
@@ -30,20 +31,37 @@ class ProfileSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Profile
-        fields = ['id','username','email','firstname','lastname','phone','location']
+        fields = ['id','username','email','firstname','lastname','phone','city']
 
-# class LoginSerializer(serializers.Serializer):
-#     username = serializers.CharField()
-#     password = serializers.CharField(write_only = True)
+class PortfolioImageSerializer(serializers.ModelSerializer):
+    class meta:
+        model = PortfolioImage
+        fields = ['id', 'image', 'caption']
 
-#     def validate(self, data):
-#         user = authenticate(
-#             username = data['username'],
-#             password = data['password']
-#         )
+class OrganizerSerializer(serializers.ModelSerializer):
+    username = serializers.CharField(source="user.username", read_only = True)
+    portfolio_images = PortfolioImageSerializer(many=True, read_only = True) 
 
-#         if not user:
-#             raise serializers.ValidationError("Invalid credentials")
-        
-#         data['user'] = user
-#         return data
+    class Meta:
+        model = OrganizerProfile
+        fields =['id','company_name','username','bio','location','address','portfolio_images','phone','email','servies','rating']
+
+
+class ExploreOptionSerializer(models.ModelSerializer):
+    explore_image = serializers.SerializerMethodField()
+
+    class Meta:
+        model = OrganizerProfile
+        fields = [
+            "id",
+            "business_name",
+            "explore_image"
+        ]
+
+    def get_home_image(self, obj):
+        photos = list(obj.portfolio_images.all())
+
+        if not photos:
+            return None
+
+        return random.choice(photos).image.url
