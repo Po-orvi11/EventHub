@@ -16,10 +16,10 @@ class Profile(models.Model):
 class OrganizerProfile(models.Model):
 
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name="organizers")
-    company_name = models.CharField(max_length=200)
-    bio = models.TextField()
-    address = models.CharField(max_length=300)
-    location = models.TextField()
+    company = models.CharField(max_length=200)
+    bio = models.TextField(blank=True)
+    address = models.CharField(max_length=300,blank=True)
+    location = models.TextField(blank=True)
     phone = models.CharField(max_length=40,blank=True)
     email = models.CharField(max_length=80,blank=True) 
     services = models.JSONField(
@@ -34,7 +34,7 @@ class OrganizerProfile(models.Model):
     )
 
     def __str__(self):
-        return self.company_name
+        return self.company
 
 
 class PortfolioImage(models.Model):

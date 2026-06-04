@@ -9,6 +9,8 @@ import ProtectedRoute from './components/ProtectedRoute'
 import Explore from './pages/explore'
 import Saved from './pages/saved'
 import AboutUs from './pages/aboutus'
+import Organizer from './pages/organizer'
+
 
 
 function Logout(){
@@ -54,6 +56,12 @@ function App() {
              <Route path="/aboutus" element={
             <ProtectedRoute>
             <AboutUs/>
+            </ProtectedRoute>
+            }/>  
+
+             <Route path="/organizer" element={
+            <ProtectedRoute>
+            <Organizer/>
             </ProtectedRoute>
             }/>  
 

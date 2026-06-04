@@ -1,10 +1,10 @@
 from django.shortcuts import render
 from django.contrib.auth.models import User
-from .serializers import RegisterSerializer, ProfileSerializer
+from .serializers import RegisterSerializer, ProfileSerializer, OrganizerSerializer, PortfolioImageSerializer
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework import generics
 from rest_framework.response import Response
-from .models import Profile
+from .models import Profile, OrganizerProfile
 
 # Create your views here.
 class RegisterView(generics.CreateAPIView):
@@ -27,16 +27,17 @@ class ProfileView(generics.RetrieveUpdateAPIView):
 
           return profile
      
-# class loginView(generics.GenericAPIView):
-#     serializer_class = LoginSerializer
+class CreateOrganizerProfileView(generics.CreateAPIView):
+     serializer_class= OrganizerSerializer
+     permission_classes = [IsAuthenticated]
 
-#     def post(self, request):
-#         serializer = self.get_serializer(data=request.data)
-#         serializer.is_valid(raise_exception=True)
+     def perform_create(self, serializer):
+          serializer.save(user= self.request.user)
 
-#         return Response(
-#             {
-#                 "message": "Login successful"
-#             },
-#             status=status.HTTP_200_OK
-#         )
+
+class UpdateOrganizerProfileView(generics.RetrieveUpdateAPIView):
+     serializer_class= OrganizerSerializer
+     permission_classes= [IsAuthenticated]
+
+     def get_object(self):
+          return OrganizerProfile.objects.get(user=self.request.user)

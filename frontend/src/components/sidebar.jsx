@@ -1,4 +1,4 @@
-import {Home, Compass, Bookmark, Power, Users} from 'lucide-react';
+import {Home, Compass, Bookmark, Power, Users, Plus} from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
 export default function Sidebar({ open }) {
@@ -7,8 +7,8 @@ export default function Sidebar({ open }) {
     <div>
       <div
         className={`
-          absolute top-0 left-0
-          h-full w-42  font-bold text-xl
+          fixed
+          h-screen w-42  font-bold text-xl
           bg-gray-800 text-white
           bg-primary flex flex-col
            gap-8 pt-10 pl-4
@@ -36,14 +36,18 @@ export default function Sidebar({ open }) {
         <button className='flex gap-3' onClick={() => navigate("/logout")}>
         <Power size={28} strokeWidth={2.5} />Log Out
         </button>
+
+        <button className='flex gap-3' onClick={() => navigate("/organizer")}>
+        <Plus size={28} strokeWidth={2.5} />Business
+        </button>
       
       </div>
       
       <div
         className={`
           hidden md:flex
-          absolute top-0 left-0
-          h-full w-17
+          fixed
+          h-screen w-17
           bg-primary
           text-white
           gap-8 pt-10
@@ -66,6 +70,9 @@ export default function Sidebar({ open }) {
         </button>
         <button onClick={() => navigate("/logout")}>
         <Power size={28} strokeWidth={2.5} />
+        </button>
+         <button onClick={() => navigate("/organizer")}>
+        <Plus size={28} strokeWidth={2.5} />
         </button>
       </div>
 

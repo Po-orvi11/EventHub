@@ -11,7 +11,7 @@ export default function Home(){
 
     return <div className='h-screen'>
     <Navbar togglesidebar = {togglesidebar}/>
-    <main className='relative h-screen'>
+    <main className='relative h-screen pt-15'>
     <Sidebar open = {open} />
     </main>
     </div>

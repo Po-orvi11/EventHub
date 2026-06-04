@@ -31,7 +31,9 @@ function Form({route, method}){
                 navigate('/login')
             }
         }
-        catch(error){
+        catch(error){  
+            console.log(error.response?.data);
+            alert(JSON.stringify(error.response?.data));
             alert(error)
         }
         finally{

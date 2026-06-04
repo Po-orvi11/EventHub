@@ -44,10 +44,10 @@ class OrganizerSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = OrganizerProfile
-        fields =['id','company_name','username','bio','location','address','portfolio_images','phone','email','servies','rating']
+        fields =['id','company','username','bio','location','address','portfolio_images','phone','email','services','rating']
 
 
-class ExploreOptionSerializer(models.ModelSerializer):
+class ExploreOptionSerializer(serializers.ModelSerializer):
     explore_image = serializers.SerializerMethodField()
 
     class Meta:

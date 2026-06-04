@@ -6,7 +6,7 @@ function Navbar({togglesidebar}){
     const navigate = useNavigate();
 
     return (
-    <div className="flex items-center py-3 px-6 font-medium shadow justify-between  ">
+    <div className="flex items-center py-3 px-6 font-medium shadow justify-between fixed top-0 left-0 z-46 right-0 bg-white shadow  ">
         <div className="flex gap-8">
         <Menu onClick={togglesidebar} size={25}/>
         <button onClick={() => navigate("/")} className="md:text-2xl text-xl text-primary flex">
