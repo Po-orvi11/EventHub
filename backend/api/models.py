@@ -42,7 +42,9 @@ class PortfolioImage(models.Model):
     organizer = models.ForeignKey(OrganizerProfile, on_delete=models.CASCADE, related_name="portfolioImage")
     image = models.ImageField(upload_to="organizers/portfolio/")
     caption = models.CharField(max_length=255, blank=True)
+    service = models.CharField(max_length=40,blank=True)
+    city = models.CharField(max_length=30,blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        return f"{self.organizer.company_name}"
+        return f"{self.organizer.company}"

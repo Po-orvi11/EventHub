@@ -41,3 +41,15 @@ class UpdateOrganizerProfileView(generics.RetrieveUpdateAPIView):
 
      def get_object(self):
           return OrganizerProfile.objects.get(user=self.request.user)
+     
+
+class CreatePostView(generics.CreateAPIView):
+     serializer_class = PortfolioImageSerializer
+     permission_classes = [IsAuthenticated]
+
+     def perform_create(self, serializer):
+           organizer = OrganizerProfile.objects.get(
+            user=self.request.user
+           )
+
+           serializer.save(organizer=organizer)

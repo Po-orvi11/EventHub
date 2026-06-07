@@ -34,13 +34,13 @@ class ProfileSerializer(serializers.ModelSerializer):
         fields = ['id','username','email','firstname','lastname','phone','city']
 
 class PortfolioImageSerializer(serializers.ModelSerializer):
-    class meta:
+    class Meta:
         model = PortfolioImage
-        fields = ['id', 'image', 'caption']
+        fields = ['id', 'image', 'caption', 'service', 'city']
 
 class OrganizerSerializer(serializers.ModelSerializer):
     username = serializers.CharField(source="user.username", read_only = True)
-    portfolio_images = PortfolioImageSerializer(many=True, read_only = True) 
+    portfolio_images = PortfolioImageSerializer(source="portfolioImage", many=True, read_only = True) 
 
     class Meta:
         model = OrganizerProfile
