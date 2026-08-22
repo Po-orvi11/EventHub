@@ -10,6 +10,7 @@ import Explore from './pages/explore'
 import Saved from './pages/saved'
 import AboutUs from './pages/aboutus'
 import Organizer from './pages/organizer'
+import PostDetail from './components/Postdetail'
 
 
 
@@ -64,6 +65,15 @@ function App() {
             <Organizer/>
             </ProtectedRoute>
             }/>  
+
+            {/*Post detail path*/}
+            <Route path="/post/:id" element={
+              <ProtectedRoute>
+                <PostDetail/>
+              </ProtectedRoute>
+            }
+              />
+
 
           <Route path="/login" element={<Login/>}/>
           <Route path="/logout" element={<Logout/>}/>

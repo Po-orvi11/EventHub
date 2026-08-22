@@ -4,7 +4,7 @@ from .serializers import RegisterSerializer, ProfileSerializer, OrganizerSeriali
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework import generics
 from rest_framework.response import Response
-from .models import Profile, OrganizerProfile
+from .models import Profile, OrganizerProfile,PortfolioImage
 
 # Create your views here.
 class RegisterView(generics.CreateAPIView):
@@ -43,7 +43,7 @@ class UpdateOrganizerProfileView(generics.RetrieveUpdateAPIView):
           return OrganizerProfile.objects.get(user=self.request.user)
      
 
-class CreatePostView(generics.CreateAPIView):
+class CreatePostView(generics.ListCreateAPIView):
      serializer_class = PortfolioImageSerializer
      permission_classes = [IsAuthenticated]
 
@@ -53,3 +53,10 @@ class CreatePostView(generics.CreateAPIView):
            )
 
            serializer.save(organizer=organizer)
+
+     def get_queryset(self):
+          organizer = OrganizerProfile.objects.get(
+               user = self.request.user
+          )
+          return PortfolioImage.objects.filter(organizer=organizer)
+

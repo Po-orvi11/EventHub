@@ -48,8 +48,6 @@ export default function Organizer() {
       setServices(res.data.services || "");
       setRating(res.data.rating || 0);
 
-      console.log(res.data)
-
       setIsOrganizer(true);
       setEditing(false);
     } catch (error) {
@@ -396,10 +394,10 @@ export default function Organizer() {
         <div className="bg-gray-100  w-full rounded-lg p-3 lg:gap-3 gap-2 grid 2xl:grid-cols-6 lg:grid-cols-5 sm:grid-cols-4 grid-cols-3">
            {
             user?.portfolio_images?.map((post)=>{
-              return (<>
+              return (
               <PortfolioImage key={post.id} post={post}
               />
-              </>)
+              )
             })
            }
            <div className="bg-gray-200 2xl:h-60 xl:h-55 lg:h-50 md:h-40 sm:h-35 h-25 flex justify-center items-center text-gray-400" onClick={() => setEditing(true)} >
