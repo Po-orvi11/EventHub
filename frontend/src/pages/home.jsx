@@ -41,6 +41,8 @@ export default function Home() {
 
   // User location / city
   const [userCity, setUserCity] = useState("");
+  const [cityDraft, setCityDraft] = useState("");
+  const [savingCity, setSavingCity] = useState(false);
 
   const toggleSidebar = () => {
     setOpen(!open);
@@ -82,6 +84,7 @@ export default function Home() {
       const recs = recsRes.data || {};
       const city = profileRes.data?.city || "";
       setUserCity(city);
+      setCityDraft(city);
 
       // Trending (sorted by likes or popular from recs)
       const popular = recs.popular && recs.popular.length > 0 ? recs.popular : allPosts.slice(0, 8);
@@ -165,6 +168,24 @@ export default function Home() {
     }
   };
 
+  const saveCity = async (e) => {
+    e.preventDefault();
+    try {
+      setSavingCity(true);
+      const city = cityDraft.trim();
+      await api.patch("/api/profile/", { city });
+      setUserCity(city);
+      const allPostsRes = await api.get("/api/posts/");
+      const posts = allPostsRes.data || [];
+      const nearby = city ? posts.filter((p) => p.city?.toLowerCase().includes(city.toLowerCase())) : [];
+      setPopularNearYouPosts(nearby.length ? nearby : posts.filter((p) => Boolean(p.city)).length ? posts.filter((p) => Boolean(p.city)) : posts.slice(0, 6));
+    } catch (err) {
+      console.error("Failed to save preferred city:", err);
+    } finally {
+      setSavingCity(false);
+    }
+  };
+
   const handlePostClick = (post) => {
     setSelectedPostId(post.id);
   };
@@ -180,7 +201,7 @@ export default function Home() {
 
         {/* Content Container */}
         <div
-          className={`transition-all duration-300 min-h-screen px-4 sm:px-6 lg:px-8 py-6 max-w-7xl mx-auto ${
+          className={`eventhub-page-content transition-all duration-300 min-h-screen px-4 sm:px-6 lg:px-8 py-6 max-w-7xl mx-auto ${
             open ? "md:ml-[168px]" : "md:ml-[68px]"
           }`}
         >
@@ -270,6 +291,11 @@ export default function Home() {
           )}
 
           {/* 4. Popular Near You Row */}
+          <form onSubmit={saveCity} className="mb-3 flex flex-wrap items-center gap-2 text-sm">
+            <label htmlFor="nearby-city" className="font-medium text-gray-600">Your city:</label>
+            <input id="nearby-city" value={cityDraft} onChange={(e) => setCityDraft(e.target.value)} placeholder="Enter city" className="w-44 rounded-lg border border-gray-200 bg-white px-3 py-2 focus:border-primary focus:outline-none" />
+            <button type="submit" disabled={savingCity} className="rounded-lg bg-primary px-3 py-2 text-white font-semibold disabled:opacity-50">{savingCity ? "Saving..." : "Save"}</button>
+          </form>
           <ScrollRow
             title={userCity ? `Popular in ${userCity}` : "Popular Near You"}
             subtitle={

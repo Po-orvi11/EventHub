@@ -5,7 +5,6 @@ import { useState } from "react";
 function Navbar({ togglesidebar }) {
   const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState("");
-
   const handleSearchSubmit = (e) => {
     if (e.key === "Enter") {
       if (searchTerm.trim()) {
@@ -25,8 +24,8 @@ function Navbar({ togglesidebar }) {
   };
 
   return (
-    <div className="flex items-center py-3 px-6 font-medium shadow justify-between fixed top-0 left-0 z-46 right-0 bg-white">
-      <div className="flex gap-8">
+    <div className="flex items-center py-3 px-4 sm:px-6 font-medium shadow justify-between fixed top-0 left-0 z-46 right-0 bg-white">
+      <div className="flex gap-3 sm:gap-8">
         <Menu onClick={togglesidebar} size={25} className="cursor-pointer" />
         <button
           onClick={() => navigate("/")}
@@ -37,7 +36,7 @@ function Navbar({ togglesidebar }) {
         </button>
       </div>
 
-      <div className="flex gap-8 items-center">
+      <div className="flex gap-3 sm:gap-8 items-center">
         <div className="relative group flex items-center">
           <Search
             size={20}

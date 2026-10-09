@@ -59,10 +59,29 @@ class PortfolioImageSerializer(serializers.ModelSerializer):
         model = PortfolioImage
         fields = [
             'id', 'title', 'image', 'caption', 'description', 'service',
-            'event_category', 'city', 'locality', 'price', 'availability',
-            'company', 'organizer_id', 'additional_images', 'likes_count',
-            'is_liked', 'is_saved', 'is_owner', 'created_at'
+            'event_category', 'city', 'locality', 'service_areas', 'packages',
+            'price', 'availability', 'company', 'organizer_id',
+            'additional_images', 'likes_count', 'is_liked', 'is_saved',
+            'is_owner', 'created_at'
         ]
+
+    def to_internal_value(self, data):
+        if hasattr(data, 'copy'):
+            mutable_data = data.copy()
+        elif isinstance(data, dict):
+            mutable_data = dict(data)
+        else:
+            mutable_data = data
+
+        if 'packages' in mutable_data:
+            pkg_val = mutable_data.get('packages')
+            if isinstance(pkg_val, str):
+                import json
+                try:
+                    mutable_data['packages'] = json.loads(pkg_val)
+                except Exception:
+                    mutable_data['packages'] = []
+        return super().to_internal_value(mutable_data)
 
     def get_likes_count(self, obj):
         if hasattr(obj, 'likes_count_val'):
@@ -114,9 +133,10 @@ class PostDetailSerializer(serializers.ModelSerializer):
         model = PortfolioImage
         fields = [
             'id', 'title', 'image', 'caption', 'description', 'service',
-            'event_category', 'city', 'locality', 'price', 'availability',
-            'company', 'organizer_id', 'organizer', 'additional_images',
-            'likes_count', 'is_liked', 'is_saved', 'is_owner', 'created_at'
+            'event_category', 'city', 'locality', 'service_areas', 'packages',
+            'price', 'availability', 'company', 'organizer_id', 'organizer',
+            'additional_images', 'likes_count', 'is_liked', 'is_saved',
+            'is_owner', 'created_at'
         ]
 
     def get_likes_count(self, obj):

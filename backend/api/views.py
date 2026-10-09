@@ -11,11 +11,13 @@ from .models import (
     Profile,
     OrganizerProfile,
     PortfolioImage,
+    PostImage,
     PostLike,
     SavedPost,
     ViewHistory,
     Booking,
 )
+from rest_framework import serializers
 from .serializers import (
     RegisterSerializer,
     ProfileSerializer,
@@ -94,13 +96,33 @@ class OrganizerListView(generics.ListAPIView):
         return qs
 
 
+def validate_and_save_additional_images(post, files):
+    if not files:
+        return
+    if len(files) > 10:
+        raise serializers.ValidationError("You can upload a maximum of 10 gallery photos at a time.")
+    for img_file in files:
+        if img_file.size > 5 * 1024 * 1024:
+            raise serializers.ValidationError("Each gallery photo must be 5MB or smaller.")
+        content_type = getattr(img_file, 'content_type', '')
+        if content_type and not content_type.startswith('image/'):
+            raise serializers.ValidationError("All uploaded gallery files must be valid image formats.")
+        PostImage.objects.create(post=post, image=img_file)
+
+
 class CreatePostView(generics.ListCreateAPIView):
     serializer_class = PortfolioImageSerializer
     permission_classes = [IsAuthenticated]
 
     def perform_create(self, serializer):
-        organizer = OrganizerProfile.objects.get(user=self.request.user)
-        serializer.save(organizer=organizer)
+        try:
+            organizer = OrganizerProfile.objects.get(user=self.request.user)
+        except OrganizerProfile.DoesNotExist:
+            raise serializers.ValidationError("You must create an organizer business profile before posting.")
+
+        post = serializer.save(organizer=organizer)
+        additional_files = self.request.FILES.getlist('additional_images')
+        validate_and_save_additional_images(post, additional_files)
 
     def get_queryset(self):
         try:
@@ -108,6 +130,26 @@ class CreatePostView(generics.ListCreateAPIView):
             return PortfolioImage.objects.filter(organizer=organizer)
         except OrganizerProfile.DoesNotExist:
             return PortfolioImage.objects.none()
+
+
+class PostManageView(generics.RetrieveUpdateDestroyAPIView):
+    queryset = PortfolioImage.objects.all()
+    serializer_class = PortfolioImageSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_object(self):
+        post = super().get_object()
+        if post.organizer.user != self.request.user:
+            raise PermissionDenied("You do not have permission to edit or delete this post.")
+        return post
+
+    def perform_update(self, serializer):
+        post = serializer.save()
+        additional_files = self.request.FILES.getlist('additional_images')
+        validate_and_save_additional_images(post, additional_files)
+
+    def perform_destroy(self, instance):
+        instance.delete()
 
 
 class PostDetailView(generics.RetrieveAPIView):
@@ -142,8 +184,11 @@ class SearchPostsView(generics.ListAPIView):
         if q:
             queryset = queryset.filter(
                 Q(caption__icontains=q)
+                | Q(title__icontains=q)
                 | Q(service__icontains=q)
                 | Q(city__icontains=q)
+                | Q(locality__icontains=q)
+                | Q(service_areas__icontains=q)
                 | Q(organizer__company__icontains=q)
                 | Q(organizer__bio__icontains=q)
             )
@@ -151,12 +196,15 @@ class SearchPostsView(generics.ListAPIView):
         cat_filter = service or category
         if cat_filter and cat_filter.lower() != "all":
             queryset = queryset.filter(
-                Q(service__icontains=cat_filter) | Q(caption__icontains=cat_filter)
+                Q(service__icontains=cat_filter) | Q(caption__icontains=cat_filter) | Q(event_category__icontains=cat_filter)
             )
 
         if city and city.lower() != "all":
             queryset = queryset.filter(
-                Q(city__icontains=city) | Q(organizer__location__icontains=city)
+                Q(city__icontains=city)
+                | Q(locality__icontains=city)
+                | Q(service_areas__icontains=city)
+                | Q(organizer__location__icontains=city)
             )
 
         if organizer_id:

@@ -52,6 +52,8 @@ class PortfolioImage(models.Model):
     event_category = models.CharField(max_length=50, blank=True)
     city = models.CharField(max_length=50, blank=True)
     locality = models.CharField(max_length=100, blank=True)
+    service_areas = models.CharField(max_length=255, blank=True)
+    packages = models.JSONField(default=list, blank=True)
     price = models.CharField(max_length=100, blank=True)
     availability = models.CharField(max_length=100, blank=True, default="Available")
     created_at = models.DateTimeField(auto_now_add=True)

@@ -19,6 +19,7 @@ import api from "../api";
 import BackNav from "./BackNav";
 import { ACCESS_TOKEN } from "../constants";
 import { getImageUrl } from "./PostCard";
+import BookingModal from "./BookingModal";
 
 export default function PostDetail({ postId, onClose, isModal = false }) {
   const params = useParams();
@@ -35,6 +36,7 @@ export default function PostDetail({ postId, onClose, isModal = false }) {
   const [copied, setCopied] = useState(false);
   const [likeLoading, setLikeLoading] = useState(false);
   const [saveLoading, setSaveLoading] = useState(false);
+  const [showBookingModal, setShowBookingModal] = useState(false);
 
   useEffect(() => {
     if (id) {
@@ -268,6 +270,16 @@ export default function PostDetail({ postId, onClose, isModal = false }) {
               </div>
             )}
 
+            {(post?.service_areas || post?.packages?.length > 0) && (
+              <div className="mt-4 space-y-3">
+                {post.service_areas && <p className="text-sm text-gray-600"><span className="font-semibold text-gray-800">Service areas:</span> {post.service_areas}</p>}
+                {post.packages?.length > 0 && <div className="grid gap-2">{post.packages.map((item, index) => <div key={`${item.name}-${index}`} className="rounded-xl border border-gray-100 bg-gray-50 p-3">
+                  <div className="flex justify-between gap-3"><span className="font-semibold text-gray-800">{item.name}</span><span className="font-semibold text-primary">{item.price}</span></div>
+                  {item.inclusions && <p className="mt-1 text-xs text-gray-600">{item.inclusions}</p>}
+                </div>)}</div>}
+              </div>
+            )}
+
             {post?.organizer?.bio && (
               <p className="text-sm text-gray-600 leading-relaxed mt-2 bg-gray-50/70 p-3.5 rounded-xl border border-gray-100">
                 {post.organizer.bio}
@@ -360,11 +372,8 @@ export default function PostDetail({ postId, onClose, isModal = false }) {
           {/* Primary Action Button */}
           <div className="flex flex-col sm:flex-row gap-3">
             <button
-              onClick={() => {
-                if (isModal && onClose) onClose();
-                navigate(`/organizer?book=${post?.organizer_id || ""}&service=${encodeURIComponent(post?.service || "")}`);
-              }}
-              className="flex-1 bg-primary text-white py-3.5 px-6 rounded-xl font-semibold shadow-lg hover:opacity-95 transition text-center flex items-center justify-center gap-2"
+              onClick={() => setShowBookingModal(true)}
+              className="flex-1 bg-primary text-white py-3.5 px-6 rounded-xl font-semibold shadow-lg hover:opacity-95 transition text-center flex items-center justify-center gap-2 cursor-pointer"
             >
               <Calendar size={18} />
               Book Organizer
@@ -372,7 +381,7 @@ export default function PostDetail({ postId, onClose, isModal = false }) {
 
             <button
               onClick={handleOrganizerClick}
-              className="border border-primary text-primary py-3.5 px-6 rounded-xl font-semibold hover:bg-primary/5 transition text-center"
+              className="border border-primary text-primary py-3.5 px-6 rounded-xl font-semibold hover:bg-primary/5 transition text-center cursor-pointer"
             >
               View Business
             </button>
@@ -409,6 +418,18 @@ export default function PostDetail({ postId, onClose, isModal = false }) {
             content
           )}
         </div>
+        {showBookingModal && (
+          <BookingModal
+            isOpen={showBookingModal}
+            onClose={() => setShowBookingModal(false)}
+            organizer={
+              post?.organizer
+                ? { ...post.organizer, id: post.organizer_id }
+                : { id: post?.organizer_id, company: post?.company }
+            }
+            post={post}
+          />
+        )}
       </div>
     );
   }
@@ -437,6 +458,19 @@ export default function PostDetail({ postId, onClose, isModal = false }) {
           content
         )}
       </main>
+
+      {showBookingModal && (
+        <BookingModal
+          isOpen={showBookingModal}
+          onClose={() => setShowBookingModal(false)}
+          organizer={
+            post?.organizer
+              ? { ...post.organizer, id: post.organizer_id }
+              : { id: post?.organizer_id, company: post?.company }
+          }
+          post={post}
+        />
+      )}
     </div>
   );
 }

@@ -236,3 +236,96 @@ class EventHubAPITests(APITestCase):
         self.client.force_authenticate(user=self.user2)
         unauth_res = self.client.get(f"/api/bookings/{booking_id}/")
         self.assertEqual(unauth_res.status_code, status.HTTP_403_FORBIDDEN)
+
+    def test_duplicate_booking_blocked(self):
+        self.client.force_authenticate(user=self.user1)
+        booking_data = {
+            "organizer": self.organizer.id,
+            "service": "Decoration",
+            "event_date": str(datetime.date.today() + datetime.timedelta(days=20)),
+            "location": "Pune",
+            "contact_phone": "9998887776",
+        }
+        res1 = self.client.post("/api/bookings/", booking_data)
+        self.assertEqual(res1.status_code, status.HTTP_201_CREATED)
+
+        # Attempt duplicate submission for same organizer and date
+        res2 = self.client.post("/api/bookings/", booking_data)
+        self.assertEqual(res2.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertIn("already have an active or pending booking", str(res2.data))
+
+    # ------------------ POST MANAGEMENT & PERMISSION TESTS ------------------
+    def test_owner_can_edit_and_delete_post(self):
+        self.client.force_authenticate(user=self.organizer_user)
+
+        # Owner edits post
+        edit_res = self.client.patch(
+            f"/api/post/{self.post1.id}/manage/",
+            {"title": "Updated Title", "caption": "Updated Caption", "price": "₹30,000"}
+        )
+        self.assertEqual(edit_res.status_code, status.HTTP_200_OK)
+        self.assertEqual(edit_res.data["caption"], "Updated Caption")
+
+        # Owner deletes post
+        del_res = self.client.delete(f"/api/post/{self.post1.id}/manage/")
+        self.assertEqual(del_res.status_code, status.HTTP_204_NO_CONTENT)
+        self.assertFalse(PortfolioImage.objects.filter(id=self.post1.id).exists())
+
+    def test_non_owner_cannot_edit_or_delete_post(self):
+        # Authenticate as user1 (client, not owner of post1)
+        self.client.force_authenticate(user=self.user1)
+
+        # Attempt to edit
+        edit_res = self.client.patch(
+            f"/api/post/{self.post1.id}/manage/",
+            {"caption": "Hacked Caption"}
+        )
+        self.assertEqual(edit_res.status_code, status.HTTP_403_FORBIDDEN)
+
+        # Attempt to delete
+        del_res = self.client.delete(f"/api/post/{self.post1.id}/manage/")
+        self.assertEqual(del_res.status_code, status.HTTP_403_FORBIDDEN)
+        self.assertTrue(PortfolioImage.objects.filter(id=self.post1.id).exists())
+
+    def test_post_service_areas_and_packages_flow(self):
+        self.client.force_authenticate(user=self.organizer_user)
+
+        packages_data = [
+            {
+                "name": "Silver Wedding Package",
+                "price": "₹45,000",
+                "inclusions": ["Stage Backdrop", "Floral Arch", "200 LED Lights"]
+            },
+            {
+                "name": "Gold Royal Package",
+                "price": "₹85,000",
+                "inclusions": ["Grand Mandap", "Entry Passage Decor", "Premium Lights", "Stage Furniture"]
+            }
+        ]
+
+        # Owner updates post with service_areas and packages
+        update_res = self.client.patch(
+            f"/api/post/{self.post1.id}/manage/",
+            {
+                "service_areas": "Kanpur, Unnao, Lucknow Outer",
+                "packages": packages_data,
+            },
+            format="json"
+        )
+        self.assertEqual(update_res.status_code, status.HTTP_200_OK)
+        self.assertEqual(update_res.data["service_areas"], "Kanpur, Unnao, Lucknow Outer")
+        self.assertEqual(len(update_res.data["packages"]), 2)
+        self.assertEqual(update_res.data["packages"][0]["name"], "Silver Wedding Package")
+        self.assertEqual(len(update_res.data["packages"][0]["inclusions"]), 3)
+
+        # Retrieve post via PostDetailView
+        detail_res = self.client.get(f"/api/post/{self.post1.id}/")
+        self.assertEqual(detail_res.status_code, status.HTTP_200_OK)
+        self.assertEqual(detail_res.data["service_areas"], "Kanpur, Unnao, Lucknow Outer")
+        self.assertEqual(len(detail_res.data["packages"]), 2)
+        self.assertEqual(detail_res.data["packages"][1]["name"], "Gold Royal Package")
+
+        # Search posts by service_areas keyword
+        search_res = self.client.get("/api/posts/search/?q=Unnao")
+        self.assertEqual(search_res.status_code, status.HTTP_200_OK)
+        self.assertTrue(any(p["id"] == self.post1.id for p in search_res.data))

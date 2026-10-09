@@ -76,7 +76,7 @@ export default function Saved() {
         <Sidebar open={open} />
 
         <div
-          className={`transition-all duration-300 min-h-screen px-4 sm:px-6 lg:px-8 py-6 max-w-7xl mx-auto ${
+          className={`eventhub-page-content transition-all duration-300 min-h-screen px-4 sm:px-6 lg:px-8 py-6 max-w-7xl mx-auto ${
             open ? "md:ml-[168px]" : "md:ml-[68px]"
           }`}
         >

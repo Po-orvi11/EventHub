@@ -16,3 +16,22 @@
     scrollbar-width: none;
   }
 }
+
+/* Keep page content centered inside the space left by the fixed desktop rail. */
+.eventhub-page-content {
+  min-width: 0;
+}
+
+@media (min-width: 768px) {
+  .eventhub-page-content {
+    width: min(calc(100% - 68px), 1440px) !important;
+    max-width: none !important;
+    margin-left: calc(68px + max(0px, (100% - 68px - 1440px) / 2)) !important;
+    margin-right: 0 !important;
+  }
+
+  .eventhub-page-content[class~="md:ml-[168px]"] {
+    width: min(calc(100% - 168px), 1440px) !important;
+    margin-left: calc(168px + max(0px, (100% - 168px - 1440px) / 2)) !important;
+  }
+}

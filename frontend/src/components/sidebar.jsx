@@ -9,8 +9,8 @@ export default function Sidebar({ open }) {
       {/* Expanded Drawer Sidebar */}
       <div
         className={`
-          fixed
-          h-screen w-48 font-bold text-lg
+          fixed top-15
+          h-[calc(100vh-4rem)] w-48 font-bold text-lg
           bg-primary text-white flex flex-col
           gap-6 pt-8 pl-5
           transition-transform duration-300 ease-in-out
@@ -57,8 +57,8 @@ export default function Sidebar({ open }) {
       <div
         className={`
           hidden md:flex
-          fixed
-          h-screen w-17
+          fixed top-15
+          h-[calc(100vh-4rem)] w-17
           bg-primary
           text-white
           gap-7 pt-8

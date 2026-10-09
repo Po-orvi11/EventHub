@@ -14,7 +14,9 @@ urlpatterns = [
     # Posts & Feed
     path("post/create/", views.CreatePostView.as_view(), name="post_created"),
     path("post/<int:pk>/", views.PostDetailView.as_view(), name="post_details"),
+    path("post/<int:pk>/manage/", views.PostManageView.as_view(), name="post_manage"),
     path("posts/", views.SearchPostsView.as_view(), name="posts_search"),
+    path("posts/search/", views.SearchPostsView.as_view(), name="posts_search_alias"),
     path("posts/recommendations/", views.RecommendationPostsView.as_view(), name="posts_recommendations"),
     path("categories/", views.CategoryListView.as_view(), name="categories_list"),
 
